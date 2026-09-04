@@ -1,17 +1,56 @@
 {
   "name": "dsh-plugin-plan-sidebar",
   "version": "1.0.0",
-  "description": "Universal Collapsible Plan & Task Execution Sidebar for DeepSeek Harness (DSH)",
-  "main": "index.js",
+  "description": "Universal Collapsible Plan, Task Execution & Switchboard Workbench Sidebar for DeepSeek Harness (DSH)",
   "type": "module",
+  "main": "lib/host/index.js",
+  "types": "lib/host/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/host/index.d.ts",
+      "default": "./lib/host/index.js"
+    },
+    "./client": {
+      "types": "./lib/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./contract": {
+      "types": "./lib/contract/index.d.ts",
+      "default": "./lib/contract/index.js"
+    },
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "connection",
+        "slots",
+        "locale",
+        "layout",
+        "settingsScope"
+      ]
+    }
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.1"
+  },
   "keywords": [
     "dsh-plugin",
     "cordis",
     "sidebar",
-    "plan-provider",
-    "task-board",
+    "plan",
+    "tasks",
+    "switchboard",
+    "the-architect",
+    "explorer",
+    "git",
     "ui"
   ],
-  "author": "Antigravity",
+  "author": "Bebbolus",
   "license": "MIT"
 }

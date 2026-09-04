@@ -1,0 +1,235 @@
+@import '../styles.css';
+
+/* Sidebar-wide file modal (ADR-004). Rendered inside DockContext.Provider but
+   OUTSIDE the tab panels, so it overlays every tab and stays mounted even
+   when the dock is collapsed. The backdrop covers the whole dock region and
+   dims it; the dialog is a centered panel that stops propagation so clicking
+   inside it never closes. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.dialog {
+  /* Default size (used until the user drags a handle and a size is stored).
+     A user-set value is injected as the --bsd-modal-w/--bsd-modal-h custom
+     properties (clamped to the viewport by the drag handler), which override
+     these defaults cleanly — no max-width/max-height cascade conflict. */
+  --bsd-modal-w: min(560px, calc(100vw - 32px));
+  --bsd-modal-h: min(70%, calc(100vh - 32px));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: var(--bsd-modal-w);
+  /* A larger configured/setting width must not overflow tiny viewports. */
+  max-width: calc(100vw - 32px);
+  height: var(--bsd-modal-h);
+  background: var(--bsd-bg);
+  border: 1px solid var(--bsd-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* Right-edge resize handle (drag horizontally to change width). Sits on the
+   dialog's right border, transparent until hovered, and grows the cursor hit
+   area beyond its painted strip. */
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: ew-resize;
+  touch-action: none;
+  z-index: 2;
+}
+.resizeHandle:hover {
+  background: var(--bsd-accent, #0969da);
+  opacity: 0.5;
+}
+
+/* Bottom-right corner resize handle (drag diagonally to change both width and
+   height). Mirrors a native resize grip. */
+.resizeCorner {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 2;
+  background:
+    linear-gradient(135deg, transparent 50%, var(--bsd-muted, #656d76) 50%) no-repeat;
+  background-position: 100% 100%;
+  background-size: 6px 6px;
+}
+.resizeCorner:hover {
+  background: var(--bsd-accent, #0969da);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
+  border-bottom: 1px solid var(--bsd-border);
+  flex: 0 0 auto;
+}
+
+.title {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bsd-text);
+}
+
+.closeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--bsd-muted);
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background: var(--bsd-bg-hover);
+  color: var(--bsd-text);
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  background: var(--bsd-bg);
+}
+
+.status {
+  padding: 24px 16px;
+  color: var(--bsd-muted);
+  text-align: center;
+  font-size: 13px;
+}
+
+.error {
+  padding: 16px;
+  color: var(--bsd-danger);
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.content {
+  margin: 0;
+  padding: 12px 16px;
+  font-family: var(--bsd-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--bsd-fg);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.truncated {
+  padding: 8px 16px 12px;
+  color: var(--bsd-muted);
+  font-size: 12px;
+}
+
+/* Two-pane (old/new) side-by-side diff view (ADR-004). Rendered for git-tracked
+   opens; replaces the single unified <pre>. Each hunk is a header separator plus
+   a stack of aligned rows, and each row is a 2-column grid (old | new) split by a
+   vertical divider. */
+.diff {
+  padding: 4px 0 12px;
+}
+
+.diffHunk {
+  margin: 4px 0;
+}
+
+.diffHunkHeader {
+  padding: 3px 12px;
+  border-top: 1px solid var(--bsd-border);
+  border-bottom: 1px solid var(--bsd-border);
+  background: var(--bsd-bg-raised);
+  color: var(--bsd-muted);
+  font-family: var(--bsd-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.diffRows {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* One aligned band: old cell on the left, new cell on the right, split by the
+   left cell's right border (the pane divider). */
+.diffRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-width: 0;
+}
+
+.diffCell {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  padding: 0 8px;
+  font-family: var(--bsd-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--bsd-fg);
+  white-space: pre;
+}
+
+/* The vertical divider + matching the git delete/add highlighting. The empty
+   counterpart cell carries the tone too, so a changed line reads as a full
+   band across the row (GitHub/IDE style). */
+.diffCell + .diffCell {
+  border-left: 1px solid var(--bsd-border);
+}
+.cellDelete {
+  background: rgba(248, 81, 73, 0.14);
+}
+.cellAdd {
+  background: rgba(46, 160, 67, 0.15);
+}
+
+.diffLineNum {
+  flex: none;
+  width: 40px;
+  padding-right: 12px;
+  text-align: right;
+  color: var(--bsd-muted);
+  user-select: none;
+  border-right: 1px solid var(--bsd-border);
+  margin-right: 8px;
+  opacity: 0.8;
+}
+
+.diffLineText {
+  white-space: pre-wrap;
+  word-break: break-all;
+  min-width: 0;
+}

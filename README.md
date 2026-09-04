@@ -1,53 +1,89 @@
 # dsh-plugin-plan-sidebar
 
-Universal Collapsible Plan & Task Execution Workbench for **DeepSeek Harness (DSH)** and **Cordis**.
+Universal Collapsible Right-Dock Workbench Sidebar for **DeepSeek Harness (DSH)** and **Cordis**.
 
-## Caratteristiche
+Provides a responsive right-dock sidebar occupying the frame's `details` column with native drag-resize, left-footer toggle button, keyboard shortcut (`Ctrl/Cmd+Shift+B`), and an extensible tab registry.
 
-* **Agnostico & Aperto:** Non legato a un singolo planner. Consuma qualsiasi piano conforme a `PlanProviderContract` (The Architect, Ralph, DSH native Todo o planner custom).
-* **Sidebar a Scomparsa (Collapsible):** Permette all'utente di comprimere o espandere il tab con un clic, mantenendo la chat pulita.
-* **Ispezione Deliverable Intermedi:** Cliccando su un task completato, espande il markdown del risultato intermedio (`task_XX_result.md`) direttamente nella sidebar.
-* **Barra di Progresso Dinamica:** Calcola la percentuale di completamento in tempo reale basandosi sui task validati.
-* **Gate di Controllo Utente:** Pulsanti integrati per approvare, sospendere o modificare gli step del piano.
+---
 
-## Contratto di Piano (`PlanProviderContract`)
+## 🚀 Caratteristiche & Tab Integrati
 
-Qualsiasi planner può aggiornare la sidebar invocando il tool `plan_sidebar_update` o scrivendo su `.dsh/tasks/plan.json`:
+1. **📋 Piano & Task Board (Tab 1 - Priority Order 5):**
+   - **Avanzamento in Tempo Reale:** Barra di progresso dinamica percentuale e contatore completamento `(X/Y)`.
+   - **Task Cards Interattive:** Monitora ogni task con badge di stato colorati (`COMPLETED`, `RUNNING`, `RETRY`, `FAILED`, `PENDING`).
+   - **Ispezione Deliverable Intermedi:** Cliccando sul deliverable intermedio di un task, visualizza l'anteprima del file prodotto (`.dsh/tasks/task_XX_result.md`) direttamente nella sidebar senza uscire dalla conversazione.
+   - **Gate di Controllo:** Pulsanti per Approvare (`▶ Approva`) o Sospendere (`⏸ Sospendi`) il piano.
 
-```json
-{
-  "plan_id": "PLAN-001",
-  "title": "Creazione Monografia OKF",
-  "status": "IN_PROGRESS",
-  "tasks": [
-    {
-      "id": "TASK-01",
-      "title": "Ingestion e Ricerca Fonti",
-      "status": "COMPLETED",
-      "assigned_role": "explorer",
-      "runner": "native",
-      "deliverable_file": ".dsh/tasks/task_01_result.md"
-    },
-    {
-      "id": "TASK-02",
-      "title": "Compilazione Bozza",
-      "status": "RUNNING",
-      "assigned_role": "curator",
-      "runner": "dsh_runner_python",
-      "deliverable_file": ".dsh/tasks/task_02_draft.md"
-    }
-  ]
-}
+2. **🎛️ Cordis Switchboard (Tab 2 - Priority Order 10):**
+   - **Filtro di Ricerca Live:** Cerca istantaneamente plugin, tool e provider attivi.
+   - **Web Search Provider Toggle:** Passa con un clic da **SearXNG OSINT** a **Default Web Search**.
+   - **OSINT & Intelligence Toggles:** Attiva/disattiva Agent-Reach, YouTube Transcripts, Scraper.
+   - **Security & Execution Toggles:** Controllo per NPM Guard e The Architect.
+   - **Isolamento Per-Session:** Ogni sessione o turn di conversazione mantiene il proprio stato di toggle in `.dsh/switches.json`.
+
+3. **📁 Explorer (Workspace File Tree - Order 20):**
+   - Albero dei file del workspace con navigazione rapida e visualizzazione file diff.
+
+4. **🌿 Git (Source Control - Order 30):**
+   - Stato modifiche, staging, visualizzazione diff side-by-side e storico commit.
+
+5. **⚡ Skills & Tools (Order 40 & 50):**
+   - Catalogo delle skill caricate e registro strumenti disponibili.
+
+---
+
+## 📦 Installazione Canonica in DeepSeek Harness
+
+Esegui dal terminale di DSH o dal container:
+
+```bash
+dsh plugin --profile web add dsh-plugin-plan-sidebar
 ```
 
-## Installazione in DSH
+DSH riconosce automaticamente la dichiarazione `dsh.bundle.patch` in `package.json`, inserisce il bundle in `dsh.profile.bundles` del profilo web e carica il client bundle nella Web GUI.
 
-In `cordis.patch.yml`:
+Oppure tramite patch manuale in `cordis.patch.yml`:
 ```yaml
 - insert:
-    - id: plan-sidebar
+    - id: dsh-plugin-plan-sidebar
       name: 'dsh-plugin-plan-sidebar'
 ```
 
+---
+
+## 🔌 Estensibilità Tab (`ctx.betterSidebar`)
+
+Il plugin espone il servizio `betterSidebar` nel context Cordis client. Qualsiasi plugin terzo può registrare tab personalizzati:
+
+```typescript
+ctx.inject(['betterSidebar'], (innerCtx) => {
+  innerCtx.betterSidebar.tabs.register({
+    id: 'my-custom-tab',
+    order: 15,
+    label: () => 'Mio Tab',
+    icon: <MyIcon />,
+    renderPanel: () => <MyPanel />
+  });
+});
+```
+
+---
+
+## 🌐 Pubblicazione su dsh-plugin.org & npm
+
+1. **Tag e Release su GitHub:**
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+2. **Pubblicazione npm:**
+   ```bash
+   npm publish --access public
+   ```
+3. **Indicizzazione:**
+   Il marketplace `https://dsh-plugin.org` rileva automaticamente i pacchetti npm aventi la keyword `dsh-plugin` e il manifest `dsh.bundle`.
+
+---
+
 ## Licenza
-MIT
+MIT © Bebbolus
