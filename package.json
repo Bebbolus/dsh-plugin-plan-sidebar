@@ -1,0 +1,17 @@
+{
+  "name": "dsh-plugin-plan-sidebar",
+  "version": "1.0.0",
+  "description": "Universal Collapsible Plan & Task Execution Sidebar for DeepSeek Harness (DSH)",
+  "main": "index.js",
+  "type": "module",
+  "keywords": [
+    "dsh-plugin",
+    "cordis",
+    "sidebar",
+    "plan-provider",
+    "task-board",
+    "ui"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}
