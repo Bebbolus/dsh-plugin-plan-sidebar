@@ -1,48 +1,56 @@
-# dsh-plugin-plan-sidebar
+# dsh-plugin-plan-sidebar 📋
+
+[![npm version](https://img.shields.io/npm/v/dsh-plugin-plan-sidebar.svg)](https://www.npmjs.com/package/dsh-plugin-plan-sidebar)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![DSH Plugin Hub](https://img.shields.io/badge/DSH--Plugin-UI--Workbench-green.svg)](https://dsh-plugin.org)
 
 Universal Collapsible Right-Dock Workbench Sidebar for **DeepSeek Harness (DSH)** and **Cordis**.
 
-Provides a responsive right-dock sidebar occupying the frame's `details` column with native drag-resize, left-footer toggle button, keyboard shortcut (`Ctrl/Cmd+Shift+B`), and an extensible tab registry.
+Provides an integrated, multi-tab workbench sidebar occupying the frame's `details` column with native drag-resize width persistence, a left-footer toggle button matching DSH Settings pixel-for-pixel, keyboard shortcut (`Ctrl/Cmd+Shift+B`), full Day/Night mode theme support, and an extensible tab registry.
 
 ---
 
-## 🚀 Caratteristiche & Tab Integrati
+## 🌟 Key Features & Integrated Tabs
 
-1. **📋 Piano & Task Board (Tab 1 - Priority Order 5):**
-   - **Avanzamento in Tempo Reale:** Barra di progresso dinamica percentuale e contatore completamento `(X/Y)`.
-   - **Task Cards Interattive:** Monitora ogni task con badge di stato colorati (`COMPLETED`, `RUNNING`, `RETRY`, `FAILED`, `PENDING`).
-   - **Ispezione Deliverable Intermedi:** Cliccando sul deliverable intermedio di un task, visualizza l'anteprima del file prodotto (`.dsh/tasks/task_XX_result.md`) direttamente nella sidebar senza uscire dalla conversazione.
-   - **Gate di Controllo:** Pulsanti per Approvare (`▶ Approva`) o Sospendere (`⏸ Sospendi`) il piano.
+1. **📋 Plan & Task Board (Tab 1 - Priority Order 5):**
+   - **Real-Time Progress Tracking:** Dynamic percentage progress bar and task completion counter `(X/Y)`.
+   - **Interactive Task Cards:** Live status badges (`COMPLETED`, `RUNNING`, `RETRY`, `FAILED`, `PENDING`), assigned agent roles, and Docker runners.
+   - **Intermediate Deliverable Inspector:** Click any task deliverable to instantly expand and preview the generated markdown report (`.dsh/tasks/task_XX_result.md`) directly in the sidebar without leaving your conversation.
+   - **Gate Controls:** Interactive buttons to Approve (`▶ Approve`) or Suspend (`⏸ Suspend`) execution at gate checkpoints.
 
 2. **🎛️ Cordis Switchboard (Tab 2 - Priority Order 10):**
-   - **Filtro di Ricerca Live:** Cerca istantaneamente plugin, tool e provider attivi.
-   - **Web Search Provider Toggle:** Passa con un clic da **SearXNG OSINT** a **Default Web Search**.
-   - **OSINT & Intelligence Toggles:** Attiva/disattiva Agent-Reach, YouTube Transcripts, Scraper.
-   - **Security & Execution Toggles:** Controllo per NPM Guard e The Architect.
-   - **Isolamento Per-Session:** Ogni sessione o turn di conversazione mantiene il proprio stato di toggle in `.dsh/switches.json`.
+   - **Instant Search:** Filter active tools, plugins, and providers in real time.
+   - **Web Search Provider Toggle:** Switch on the fly between **SearXNG OSINT** and **Default Web Search**.
+   - **OSINT & Intelligence Toggles:** Toggle Agent-Reach, YouTube Transcripts, Scrapers per turn.
+   - **Per-Session State:** Each conversation maintains its isolated toggle configuration in `.dsh/switches.json`.
 
-3. **📁 Explorer (Workspace File Tree - Order 20):**
-   - Albero dei file del workspace con navigazione rapida e visualizzazione file diff.
+3. **📁 Workspace File Explorer (Order 20):**
+   - Fast file tree navigation for the entire workspace (`apps/`, `vault/`, `.dsh/tasks/`) with inline markdown preview and side-by-side diffs.
 
-4. **🌿 Git (Source Control - Order 30):**
-   - Stato modifiche, staging, visualizzazione diff side-by-side e storico commit.
+4. **🌿 Git Version Control (Order 30):**
+   - Modified file status, file staging, visual side-by-side diff viewer, and commit history.
 
-5. **⚡ Skills & Tools (Order 40 & 50):**
-   - Catalogo delle skill caricate e registro strumenti disponibili.
+5. **⚡ Skills & Tools Catalogs (Order 40 & 50):**
+   - Live browser of installed skill blueprints and registered Cordis runtime tools.
+
+6. **🎨 Pixel-Perfect Styling & Theme Integration:**
+   - **Footer Toggle Button:** Styled to match DSH Settings (`42px` height, `12px` border radius, outline panel SVG icon, identical hover/active states).
+   - **Canonical Theme Tokens:** Built with `--bsd-fg`, `--bsd-fg-muted`, `--bsd-bg-raised`, and `--bsd-border` for contrast in both Dark and Light ("Day") modes.
 
 ---
 
-## 📦 Installazione Canonica in DeepSeek Harness
+## 📦 Installation in DeepSeek Harness
 
-Esegui dal terminale di DSH o dal container:
+Run from your DSH terminal or container environment:
 
 ```bash
 dsh plugin --profile web add dsh-plugin-plan-sidebar
 ```
 
-DSH riconosce automaticamente la dichiarazione `dsh.bundle.patch` in `package.json`, inserisce il bundle in `dsh.profile.bundles` del profilo web e carica il client bundle nella Web GUI.
+DSH automatically discovers the `dsh.bundle.patch` declaration in `package.json`, registers the bundle in `dsh.profile.bundles`, and injects the client bundle into the Web GUI.
 
-Oppure tramite patch manuale in `cordis.patch.yml`:
+Or configure manually in `cordis.patch.yml`:
+
 ```yaml
 - insert:
     - id: dsh-plugin-plan-sidebar
@@ -51,16 +59,16 @@ Oppure tramite patch manuale in `cordis.patch.yml`:
 
 ---
 
-## 🔌 Estensibilità Tab (`ctx.betterSidebar`)
+## 🔌 Tab Extensibility (`ctx.betterSidebar`)
 
-Il plugin espone il servizio `betterSidebar` nel context Cordis client. Qualsiasi plugin terzo può registrare tab personalizzati:
+The plugin registers a client-side `betterSidebar` service. Any third-party Cordis plugin can contribute custom tabs:
 
 ```typescript
 ctx.inject(['betterSidebar'], (innerCtx) => {
   innerCtx.betterSidebar.tabs.register({
     id: 'my-custom-tab',
     order: 15,
-    label: () => 'Mio Tab',
+    label: () => 'My Custom Tab',
     icon: <MyIcon />,
     renderPanel: () => <MyPanel />
   });
@@ -69,21 +77,22 @@ ctx.inject(['betterSidebar'], (innerCtx) => {
 
 ---
 
-## 🌐 Pubblicazione su dsh-plugin.org & npm
+## 🚀 Publishing to dsh-plugin.org & npm
 
-1. **Tag e Release su GitHub:**
+1. **Tag and Release on GitHub:**
    ```bash
    git tag v1.0.0
    git push origin v1.0.0
    ```
-2. **Pubblicazione npm:**
+2. **Publish to npm:**
    ```bash
    npm publish --access public
    ```
-3. **Indicizzazione:**
-   Il marketplace `https://dsh-plugin.org` rileva automaticamente i pacchetti npm aventi la keyword `dsh-plugin` e il manifest `dsh.bundle`.
+3. **Registry Discovery:**
+   `https://dsh-plugin.org` automatically indexes packages carrying the `dsh-plugin` keyword and the `dsh.bundle` manifest.
 
 ---
 
-## Licenza
+## 📄 License
+
 MIT © Bebbolus
